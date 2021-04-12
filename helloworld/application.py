@@ -3,6 +3,7 @@ import json
 from flask import Flask, Response
 from helloworld.flaskrun import flaskrun
 import requests
+from flask import Flask, Response, request
 from flask_cors import CORS
 
 application = Flask(__name__)
@@ -18,7 +19,7 @@ def post_currency_bit():
     return Response(json.dumps(get_bitcoin_index()), mimetype='application/json', status=200)
 def get_bitcoin_index():
     url = 'https://api.coindesk.com/v1/bpi/currentprice.json'
-    response = requests.get(url).json()['bpi']['USD']
+    response = requests.get(url).json()['bpi']['USD']['rate']
     return response
 # return generic data
 @application.route('/get_generic', methods=['GET'])
@@ -43,5 +44,26 @@ generic_data = [
     "body": "good will2"
     }
    ]
+   
+# get example for multiplication
+# test get  
+# curl -i http://"localhost:8000/v1/multiply?first_num=12.1&second_num=12"
+@application.route('/v1/multiply', methods=['GET', 'POST'])
+def get_mult_res():
+    first_num = request.args.get('first_num')
+    second_num = request.args.get('second_num')
+    res = float(first_num) * float(second_num) 
+    return Response(json.dumps({'multiplication result': res}), mimetype='application/json', status=200)
+    
+# get example for multiplication
+# test get  
+# curl -i http://"localhost:8000/v1/calcbit?first_num=5"
+@application.route('/v1/calcbit', methods=['GET', 'POST'])
+def get_mult_calc():
+    first_num = request.args.get('first_num')
+    second_num = get_bitcoin_index().replace(",", "")
+    res = round(float(first_num) * float(second_num)) 
+    return Response(json.dumps({'multiplication result': res}), mimetype='application/json', status=200)
+    
 if __name__ == '__main__':
     flaskrun(application)
